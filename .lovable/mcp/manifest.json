@@ -1,0 +1,409 @@
+{
+  "version": 1,
+  "sdk_version": "0.22.2",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://rlehvixkcyuauyruxgzo.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "family-ops-board",
+      "version": "1.0.0",
+      "title": "Family Ops Board"
+    },
+    "tools": [
+      {
+        "name": "get_today_overview",
+        "title": "Get today overview",
+        "description": "Returns today's calendar events, open tasks, and pending routine steps for the household.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_week_plan",
+        "title": "Get week plan",
+        "description": "Returns the next 7 days of calendar events and tasks with due dates.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_open_tasks",
+        "title": "List open tasks",
+        "description": "List household tasks that are not yet completed. Optionally filter by priority.",
+        "annotations": {
+          "readOnlyHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "priority": {
+              "type": "string",
+              "enum": [
+                "low",
+                "normal",
+                "important"
+              ],
+              "description": "Filter by priority"
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_recent_activity",
+        "title": "List recent activity",
+        "description": "Recent household activity across tasks, routines, lists, notes, and calendar.",
+        "annotations": {
+          "readOnlyHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "description": "Max rows (default 20)"
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_routines",
+        "title": "Get routines",
+        "description": "List active routines with their steps and today's completion state.",
+        "annotations": {
+          "readOnlyHint": true
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_lists",
+        "title": "Get lists",
+        "description": "Return household lists and their items.",
+        "annotations": {
+          "readOnlyHint": true
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_notes",
+        "title": "Get notes",
+        "description": "Return recent household notes.",
+        "annotations": {
+          "readOnlyHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_task",
+        "title": "Create task",
+        "description": "Add a task to the household board. Title required; due date, priority, and window optional.",
+        "annotations": {
+          "readOnlyHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "due_at": {
+              "type": "string",
+              "description": "ISO datetime"
+            },
+            "priority": {
+              "type": "string",
+              "enum": [
+                "low",
+                "normal",
+                "important"
+              ]
+            },
+            "due_window": {
+              "type": "string",
+              "enum": [
+                "morning",
+                "afternoon",
+                "evening"
+              ]
+            },
+            "notes": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_task",
+        "title": "Update task",
+        "description": "Update a task's fields.",
+        "annotations": {
+          "readOnlyHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "title": {
+              "type": "string"
+            },
+            "priority": {
+              "type": "string",
+              "enum": [
+                "low",
+                "normal",
+                "important"
+              ]
+            },
+            "due_at": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "open",
+                "in_progress",
+                "done",
+                "snoozed"
+              ]
+            },
+            "notes": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "complete_task",
+        "title": "Complete task",
+        "description": "Mark a task as done.",
+        "annotations": {
+          "readOnlyHint": false,
+          "idempotentHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_note",
+        "title": "Create note",
+        "description": "Add a note to the household inbox.",
+        "annotations": {
+          "readOnlyHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "body": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "body"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_list",
+        "title": "Create list",
+        "description": "Create a new list (shopping, packing, errands, prep, other).",
+        "annotations": {
+          "readOnlyHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "shopping",
+                "packing",
+                "errands",
+                "prep",
+                "other"
+              ]
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "add_list_item",
+        "title": "Add list item",
+        "description": "Add an item to a list.",
+        "annotations": {
+          "readOnlyHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "list_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "list_id",
+            "title"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_list_item",
+        "title": "Update list item",
+        "description": "Check, uncheck, or rename a list item.",
+        "annotations": {
+          "readOnlyHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "checked": {
+              "type": "boolean"
+            },
+            "title": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "complete_routine_step",
+        "title": "Complete routine step",
+        "description": "Mark a routine step complete for today.",
+        "annotations": {
+          "readOnlyHint": false,
+          "idempotentHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "routine_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "step_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "routine_id",
+            "step_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
