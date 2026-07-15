@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWeekRouteImport } from './routes/_authenticated/week'
 import { Route as AuthenticatedTodayRouteImport } from './routes/_authenticated/today'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedRoutinesRouteImport } from './routes/_authenticated/routines'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
@@ -48,6 +49,11 @@ const AuthenticatedTodayRoute = AuthenticatedTodayRouteImport.update({
 const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedRoutinesRoute = AuthenticatedRoutinesRouteImport.update({
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/notes': typeof AuthenticatedNotesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/routines': typeof AuthenticatedRoutinesRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/today': typeof AuthenticatedTodayRoute
   '/week': typeof AuthenticatedWeekRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/notes': typeof AuthenticatedNotesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/routines': typeof AuthenticatedRoutinesRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/today': typeof AuthenticatedTodayRoute
   '/week': typeof AuthenticatedWeekRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/routines': typeof AuthenticatedRoutinesRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/today': typeof AuthenticatedTodayRoute
   '/_authenticated/week': typeof AuthenticatedWeekRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/notes'
     | '/onboarding'
     | '/routines'
+    | '/settings'
     | '/tasks'
     | '/today'
     | '/week'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/notes'
     | '/onboarding'
     | '/routines'
+    | '/settings'
     | '/tasks'
     | '/today'
     | '/week'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notes'
     | '/_authenticated/onboarding'
     | '/_authenticated/routines'
+    | '/_authenticated/settings'
     | '/_authenticated/tasks'
     | '/_authenticated/today'
     | '/_authenticated/week'
@@ -204,6 +216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTasksRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/routines': {
       id: '/_authenticated/routines'
       path: '/routines'
@@ -248,6 +267,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedRoutinesRoute: typeof AuthenticatedRoutinesRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedTodayRoute: typeof AuthenticatedTodayRoute
   AuthenticatedWeekRoute: typeof AuthenticatedWeekRoute
@@ -259,6 +279,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedRoutinesRoute: AuthenticatedRoutinesRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedTodayRoute: AuthenticatedTodayRoute,
   AuthenticatedWeekRoute: AuthenticatedWeekRoute,
