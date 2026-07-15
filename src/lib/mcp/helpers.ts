@@ -29,6 +29,7 @@ export function supabaseForUser(ctx: ToolContext) {
 export async function getHouseholdId(ctx: ToolContext): Promise<string> {
   const supabase = supabaseForUser(ctx);
   const userId = ctx.getUserId();
+  if (!userId) throw new Error("Not authenticated");
   const { data, error } = await supabase
     .from("household_memberships")
     .select("household_id")
