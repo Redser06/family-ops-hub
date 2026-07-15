@@ -1,0 +1,13 @@
+{
+  "name": "Family Ops Board",
+  "short_name": "Family Ops",
+  "description": "One calm home for family life",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FDFCFB",
+  "theme_color": "#5F6F52",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon" }
+  ]
+}
