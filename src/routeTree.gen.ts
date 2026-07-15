@@ -17,6 +17,7 @@ import { Route as AuthenticatedTodayRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedRoutinesRouteImport } from './routes/_authenticated/routines'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedListsRouteImport } from './routes/_authenticated/lists'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -57,10 +58,16 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedListsRoute = AuthenticatedListsRouteImport.update({
+  id: '/lists',
+  path: '/lists',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/lists': typeof AuthenticatedListsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/routines': typeof AuthenticatedRoutinesRoute
   '/tasks': typeof AuthenticatedTasksRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/lists': typeof AuthenticatedListsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/routines': typeof AuthenticatedRoutinesRoute
   '/tasks': typeof AuthenticatedTasksRoute
@@ -81,6 +89,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/lists': typeof AuthenticatedListsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/routines': typeof AuthenticatedRoutinesRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
@@ -92,6 +101,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/lists'
     | '/onboarding'
     | '/routines'
     | '/tasks'
@@ -101,6 +111,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/lists'
     | '/onboarding'
     | '/routines'
     | '/tasks'
@@ -111,6 +122,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/lists'
     | '/_authenticated/onboarding'
     | '/_authenticated/routines'
     | '/_authenticated/tasks'
@@ -182,10 +194,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/lists': {
+      id: '/_authenticated/lists'
+      path: '/lists'
+      fullPath: '/lists'
+      preLoaderRoute: typeof AuthenticatedListsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedListsRoute: typeof AuthenticatedListsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedRoutinesRoute: typeof AuthenticatedRoutinesRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
@@ -194,6 +214,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedListsRoute: AuthenticatedListsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedRoutinesRoute: AuthenticatedRoutinesRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
