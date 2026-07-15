@@ -4,9 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 
+type AuthSearch = { next?: string; invite?: string };
 export const Route = createFileRoute("/auth")({
   ssr: false,
-  validateSearch: (s: Record<string, unknown>) => ({
+  validateSearch: (s: Record<string, unknown>): AuthSearch => ({
     next: typeof s.next === "string" ? s.next : undefined,
     invite: typeof s.invite === "string" ? s.invite : undefined,
   }),
