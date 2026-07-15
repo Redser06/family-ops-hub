@@ -21,6 +21,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
 import { Route as AuthenticatedListsRouteImport } from './routes/_authenticated/lists'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
+import { Route as AuthenticatedInviteTokenRouteImport } from './routes/_authenticated/invite.$token'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -81,6 +82,12 @@ const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedInviteTokenRoute =
+  AuthenticatedInviteTokenRouteImport.update({
+    id: '/invite/$token',
+    path: '/invite/$token',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/tasks': typeof AuthenticatedTasksRoute
   '/today': typeof AuthenticatedTodayRoute
   '/week': typeof AuthenticatedWeekRoute
+  '/invite/$token': typeof AuthenticatedInviteTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -107,6 +115,7 @@ export interface FileRoutesByTo {
   '/tasks': typeof AuthenticatedTasksRoute
   '/today': typeof AuthenticatedTodayRoute
   '/week': typeof AuthenticatedWeekRoute
+  '/invite/$token': typeof AuthenticatedInviteTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -122,6 +131,7 @@ export interface FileRoutesById {
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/today': typeof AuthenticatedTodayRoute
   '/_authenticated/week': typeof AuthenticatedWeekRoute
+  '/_authenticated/invite/$token': typeof AuthenticatedInviteTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/today'
     | '/week'
+    | '/invite/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/today'
     | '/week'
+    | '/invite/$token'
   id:
     | '__root__'
     | '/'
@@ -164,6 +176,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tasks'
     | '/_authenticated/today'
     | '/_authenticated/week'
+    | '/_authenticated/invite/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -258,6 +271,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedActivityRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/invite/$token': {
+      id: '/_authenticated/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof AuthenticatedInviteTokenRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -271,6 +291,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedTodayRoute: typeof AuthenticatedTodayRoute
   AuthenticatedWeekRoute: typeof AuthenticatedWeekRoute
+  AuthenticatedInviteTokenRoute: typeof AuthenticatedInviteTokenRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -283,6 +304,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedTodayRoute: AuthenticatedTodayRoute,
   AuthenticatedWeekRoute: AuthenticatedWeekRoute,
+  AuthenticatedInviteTokenRoute: AuthenticatedInviteTokenRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
