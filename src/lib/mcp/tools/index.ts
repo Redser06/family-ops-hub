@@ -1,6 +1,6 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { supabaseForUser, getHouseholdId, logMcpActivity, ok, err } from "./helpers";
+import { supabaseForUser, getHouseholdId, logMcpActivity, ok, err } from "../helpers";
 
 // ============ READ TOOLS ============
 
