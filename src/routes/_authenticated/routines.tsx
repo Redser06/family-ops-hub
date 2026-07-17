@@ -227,7 +227,7 @@ function RoutinesPage() {
                       <div className="flex items-center gap-2">
                         <select
                           value={r.cadence}
-                          onChange={(e) => updateRoutine(r.id, { cadence: e.target.value })}
+                          onChange={(e) => updateRoutine(r.id, { cadence: e.target.value as Cadence })}
                           className="px-2 py-1 rounded-lg border border-border-subtle bg-surface text-xs"
                         >
                           {CADENCES.map((c) => (
