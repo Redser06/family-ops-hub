@@ -78,7 +78,7 @@ function RoutinesPage() {
     }
   }
 
-  async function updateRoutine(id: string, patch: { name?: string; cadence?: string; active?: boolean }) {
+  async function updateRoutine(id: string, patch: { name?: string; cadence?: Cadence; active?: boolean }) {
     await supabase.from("routines").update(patch).eq("id", id);
     invalidate();
   }
