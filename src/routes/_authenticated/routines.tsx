@@ -11,7 +11,8 @@ export const Route = createFileRoute("/_authenticated/routines")({
   component: RoutinesPage,
 });
 
-const CADENCES = ["daily", "weekdays", "weekly", "custom"] as const;
+const CADENCES = ["daily", "weekly", "custom"] as const;
+type Cadence = (typeof CADENCES)[number];
 
 function RoutinesPage() {
   const { data: membership } = useQuery(membershipQuery);
