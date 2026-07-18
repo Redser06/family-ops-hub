@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { membershipQuery, weekOverviewQuery } from "@/lib/queries";
+import { membershipQuery, weekOverviewQuery, startOfTodayISO, endOfWeekISO } from "@/lib/queries";
+import { googleCalendarEventsQuery } from "@/lib/googleCalendarQueries";
 import { PageHeader } from "@/components/PageHeader";
 import { addDays, format, isSameDay } from "date-fns";
 
