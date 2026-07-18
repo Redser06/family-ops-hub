@@ -27,9 +27,10 @@ function WeekPage() {
       />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3">
         {days.map((d) => {
-          const events = (data?.events ?? []).filter((e: any) =>
-            isSameDay(new Date(e.start_at), d),
-          );
+          const events = [
+            ...(data?.events ?? []),
+            ...((gcal?.events ?? []).map((e: any) => ({ ...e, id: "g_" + e.id }))),
+          ].filter((e: any) => isSameDay(new Date(e.start_at), d));
           const tasks = (data?.tasks ?? []).filter(
             (t: any) => t.due_at && isSameDay(new Date(t.due_at), d),
           );
