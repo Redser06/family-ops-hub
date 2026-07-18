@@ -180,41 +180,48 @@ function SettingsPage() {
           Google Calendar
         </h3>
         <p className="text-sm text-charcoal/60 mb-5">
-          Sync your shared household calendar. V1 supports one shared calendar; more
-          calendars come in V2.
+          Connect your Google account so events show up on Today and Week. Each adult
+          connects their own calendar — we only request read access.
         </p>
-        {connections.length === 0 ? (
-          <div className="p-5 rounded-2xl bg-surface border border-dashed border-border-subtle text-sm text-charcoal/60">
-            <p className="mb-3">
-              Google Calendar connection isn't wired in this preview yet. When enabled, you'll
-              connect a shared calendar and events will appear in Today and Week.
-            </p>
+        {gcalStatus.isLoading ? (
+          <div className="p-5 rounded-2xl bg-surface border border-border-subtle text-sm text-charcoal/60">
+            Checking connection…
+          </div>
+        ) : gcalStatus.data?.connected ? (
+          <div className="p-4 rounded-2xl bg-sage/5 border border-sage/30 flex items-center gap-3">
+            <CheckCircle2 className="size-5 text-sage shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-charcoal truncate">
+                {gcalStatus.data.email ?? "Google Calendar connected"}
+              </p>
+              <p className="text-[10px] uppercase tracking-widest text-sage">
+                Read-only · Primary calendar
+              </p>
+            </div>
             <button
-              disabled
-              className="h-10 px-4 rounded-xl bg-charcoal/10 text-charcoal/40 text-sm font-medium cursor-not-allowed"
+              onClick={() => disconnectGcal.mutate()}
+              disabled={disconnectGcal.isPending}
+              className="h-9 px-4 rounded-xl bg-white border border-border-subtle text-xs font-semibold text-charcoal hover:bg-surface disabled:opacity-50"
             >
-              Connect Google Calendar (coming soon)
+              {disconnectGcal.isPending ? "…" : "Disconnect"}
             </button>
           </div>
         ) : (
-          <div className="space-y-2">
-            {connections.map((c) => (
-              <div
-                key={c.id}
-                className="p-4 rounded-xl bg-surface border border-border-subtle flex items-center justify-between"
-              >
-                <div>
-                  <p className="text-sm font-medium">
-                    {c.google_account_email ?? "Google Calendar"}
-                  </p>
-                  <p className="text-[10px] uppercase tracking-widest text-charcoal/50">
-                    {c.status}
-                  </p>
-                </div>
-              </div>
-            ))}
+          <div className="p-5 rounded-2xl bg-surface border border-dashed border-border-subtle">
+            <p className="text-sm text-charcoal/70 mb-3">
+              Not connected. Your primary Google Calendar events will appear on Today and
+              Week once you sign in.
+            </p>
+            <button
+              onClick={() => connectGcal.mutate()}
+              disabled={connectGcal.isPending}
+              className="h-10 px-5 rounded-xl bg-sage text-sage-foreground text-sm font-medium hover:bg-sage/90 disabled:opacity-50"
+            >
+              {connectGcal.isPending ? "Opening Google…" : "Connect Google Calendar"}
+            </button>
           </div>
         )}
+
       </section>
 
       <section className="p-6 rounded-3xl bg-white border border-border-subtle shadow-sm">
