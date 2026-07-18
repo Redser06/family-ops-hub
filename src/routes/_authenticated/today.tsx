@@ -18,6 +18,7 @@ function TodayPage() {
   const { data: membership } = useQuery(membershipQuery);
   const householdId = membership?.household_id;
   const { data } = useQuery(todayOverviewQuery(householdId));
+  const { data: gcal } = useQuery(googleCalendarEventsQuery(startOfTodayISO(), endOfTodayISO()));
   const queryClient = useQueryClient();
   const [quickTask, setQuickTask] = useState("");
 
