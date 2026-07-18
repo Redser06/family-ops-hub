@@ -1,10 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { membershipQuery, householdMembersQuery } from "@/lib/queries";
+import { googleCalendarStatusQuery } from "@/lib/googleCalendarQueries";
+import {
+  startGoogleCalendarConnect,
+  saveGoogleCalendarConnection,
+  disconnectGoogleCalendar,
+} from "@/lib/googleCalendar.functions";
+import { connectAppUser } from "@/integrations/lovable/appUserConnectorClient";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
-import { Copy, ExternalLink } from "lucide-react";
+import { Copy, ExternalLink, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/settings")({
