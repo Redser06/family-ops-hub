@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { membershipQuery, weekOverviewQuery } from "@/lib/queries";
+import { membershipQuery, weekOverviewQuery, startOfTodayISO, endOfWeekISO } from "@/lib/queries";
+import { googleCalendarEventsQuery } from "@/lib/googleCalendarQueries";
 import { PageHeader } from "@/components/PageHeader";
 import { addDays, format, isSameDay } from "date-fns";
 
@@ -12,6 +13,7 @@ function WeekPage() {
   const { data: membership } = useQuery(membershipQuery);
   const householdId = membership?.household_id;
   const { data } = useQuery(weekOverviewQuery(householdId));
+  const { data: gcal } = useQuery(googleCalendarEventsQuery(startOfTodayISO(), endOfWeekISO()));
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const days = Array.from({ length: 7 }, (_, i) => addDays(today, i));
@@ -25,9 +27,10 @@ function WeekPage() {
       />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3">
         {days.map((d) => {
-          const events = (data?.events ?? []).filter((e: any) =>
-            isSameDay(new Date(e.start_at), d),
-          );
+          const events = [
+            ...(data?.events ?? []),
+            ...((gcal?.events ?? []).map((e: any) => ({ ...e, id: "g_" + e.id }))),
+          ].filter((e: any) => isSameDay(new Date(e.start_at), d));
           const tasks = (data?.tasks ?? []).filter(
             (t: any) => t.due_at && isSameDay(new Date(t.due_at), d),
           );

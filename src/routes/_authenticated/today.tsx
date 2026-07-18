@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { membershipQuery, todayOverviewQuery } from "@/lib/queries";
+import { membershipQuery, todayOverviewQuery, startOfTodayISO, endOfTodayISO } from "@/lib/queries";
+import { googleCalendarEventsQuery } from "@/lib/googleCalendarQueries";
 import { supabase } from "@/integrations/supabase/client";
 import { logActivity, ensureRoutineInstance } from "@/lib/mutations";
 import { format, formatDistanceToNow } from "date-fns";
@@ -17,6 +18,7 @@ function TodayPage() {
   const { data: membership } = useQuery(membershipQuery);
   const householdId = membership?.household_id;
   const { data } = useQuery(todayOverviewQuery(householdId));
+  const { data: gcal } = useQuery(googleCalendarEventsQuery(startOfTodayISO(), endOfTodayISO()));
   const queryClient = useQueryClient();
   const [quickTask, setQuickTask] = useState("");
 
@@ -98,6 +100,7 @@ function TodayPage() {
   const instances = data?.instances ?? [];
 
   // Merge events + tasks with due_at today for the agenda
+  const gcalEvents = gcal?.events ?? [];
   const agendaItems = [
     ...events.map((e: any) => ({
       kind: "event" as const,
@@ -105,6 +108,13 @@ function TodayPage() {
       title: e.title,
       time: e.start_at,
       subtitle: e.location || e.description || null,
+    })),
+    ...gcalEvents.map((e: any) => ({
+      kind: "event" as const,
+      id: "g_" + e.id,
+      title: e.title,
+      time: e.start_at,
+      subtitle: e.location || null,
     })),
     ...tasks
       .filter((t: any) => t.due_at)

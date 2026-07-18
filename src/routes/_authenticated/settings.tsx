@@ -1,10 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { membershipQuery, householdMembersQuery } from "@/lib/queries";
+import { googleCalendarStatusQuery } from "@/lib/googleCalendarQueries";
+import {
+  startGoogleCalendarConnect,
+  saveGoogleCalendarConnection,
+  disconnectGoogleCalendar,
+} from "@/lib/googleCalendar.functions";
+import { connectAppUser } from "@/integrations/lovable/appUserConnectorClient";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
-import { Copy, ExternalLink } from "lucide-react";
+import { Copy, ExternalLink, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -19,7 +27,6 @@ function SettingsPage() {
   const queryClient = useQueryClient();
   const [inviteEmail, setInviteEmail] = useState("");
   const [invite, setInvite] = useState<{ token: string } | null>(null);
-  const [connections, setConnections] = useState<any[]>([]);
 
   async function createInvite() {
     if (!householdId || !inviteEmail.trim()) return;
@@ -39,25 +46,53 @@ function SettingsPage() {
     toast.success("Invite created");
   }
 
-  async function loadConnections() {
-    if (!householdId) return;
-    const { data } = await supabase
-      .from("calendar_connections")
-      .select("*")
-      .eq("household_id", householdId);
-    setConnections(data ?? []);
-  }
-
-  // load on mount
-  if (householdId && connections.length === 0) {
-    void loadConnections();
-  }
 
   function copyInvite() {
     if (!invite) return;
     navigator.clipboard.writeText(invite.token);
     toast.success("Invite code copied");
   }
+
+  // Google Calendar (per-user App User Connector)
+  const gcalStatus = useQuery(googleCalendarStatusQuery);
+  const startConnectFn = useServerFn(startGoogleCalendarConnect);
+  const saveConnFn = useServerFn(saveGoogleCalendarConnection);
+  const disconnectFn = useServerFn(disconnectGoogleCalendar);
+
+  const connectGcal = useMutation({
+    mutationFn: async () => {
+      const result = await connectAppUser({
+        connectorId: "google_calendar",
+        gatewayBaseUrl: "https://connector-gateway.lovable.dev",
+        start: async (targetOrigin) => await startConnectFn({ data: targetOrigin }),
+      });
+      if (!result.success) throw new Error(result.error ?? "Connection failed");
+      if (result.connectionAPIKey) {
+        await saveConnFn({ data: { connectionAPIKey: result.connectionAPIKey } });
+      }
+    },
+    onSuccess: () => {
+      toast.success("Google Calendar connected");
+      queryClient.invalidateQueries({ queryKey: ["google-calendar"] });
+      queryClient.invalidateQueries({ queryKey: ["today"] });
+      queryClient.invalidateQueries({ queryKey: ["week"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to connect"),
+  });
+
+  const disconnectGcal = useMutation({
+    mutationFn: async () => {
+      await disconnectFn();
+    },
+    onSuccess: () => {
+      toast.success("Google Calendar disconnected");
+      queryClient.invalidateQueries({ queryKey: ["google-calendar"] });
+      queryClient.invalidateQueries({ queryKey: ["today"] });
+      queryClient.invalidateQueries({ queryKey: ["week"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to disconnect"),
+  });
+
 
   const mcpUrl = typeof window !== "undefined" ? `${window.location.origin}/mcp` : "/mcp";
 
@@ -131,41 +166,48 @@ function SettingsPage() {
           Google Calendar
         </h3>
         <p className="text-sm text-charcoal/60 mb-5">
-          Sync your shared household calendar. V1 supports one shared calendar; more
-          calendars come in V2.
+          Connect your Google account so events show up on Today and Week. Each adult
+          connects their own calendar — we only request read access.
         </p>
-        {connections.length === 0 ? (
-          <div className="p-5 rounded-2xl bg-surface border border-dashed border-border-subtle text-sm text-charcoal/60">
-            <p className="mb-3">
-              Google Calendar connection isn't wired in this preview yet. When enabled, you'll
-              connect a shared calendar and events will appear in Today and Week.
-            </p>
+        {gcalStatus.isLoading ? (
+          <div className="p-5 rounded-2xl bg-surface border border-border-subtle text-sm text-charcoal/60">
+            Checking connection…
+          </div>
+        ) : gcalStatus.data?.connected ? (
+          <div className="p-4 rounded-2xl bg-sage/5 border border-sage/30 flex items-center gap-3">
+            <CheckCircle2 className="size-5 text-sage shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-charcoal truncate">
+                {gcalStatus.data.email ?? "Google Calendar connected"}
+              </p>
+              <p className="text-[10px] uppercase tracking-widest text-sage">
+                Read-only · Primary calendar
+              </p>
+            </div>
             <button
-              disabled
-              className="h-10 px-4 rounded-xl bg-charcoal/10 text-charcoal/40 text-sm font-medium cursor-not-allowed"
+              onClick={() => disconnectGcal.mutate()}
+              disabled={disconnectGcal.isPending}
+              className="h-9 px-4 rounded-xl bg-white border border-border-subtle text-xs font-semibold text-charcoal hover:bg-surface disabled:opacity-50"
             >
-              Connect Google Calendar (coming soon)
+              {disconnectGcal.isPending ? "…" : "Disconnect"}
             </button>
           </div>
         ) : (
-          <div className="space-y-2">
-            {connections.map((c) => (
-              <div
-                key={c.id}
-                className="p-4 rounded-xl bg-surface border border-border-subtle flex items-center justify-between"
-              >
-                <div>
-                  <p className="text-sm font-medium">
-                    {c.google_account_email ?? "Google Calendar"}
-                  </p>
-                  <p className="text-[10px] uppercase tracking-widest text-charcoal/50">
-                    {c.status}
-                  </p>
-                </div>
-              </div>
-            ))}
+          <div className="p-5 rounded-2xl bg-surface border border-dashed border-border-subtle">
+            <p className="text-sm text-charcoal/70 mb-3">
+              Not connected. Your primary Google Calendar events will appear on Today and
+              Week once you sign in.
+            </p>
+            <button
+              onClick={() => connectGcal.mutate()}
+              disabled={connectGcal.isPending}
+              className="h-10 px-5 rounded-xl bg-sage text-sage-foreground text-sm font-medium hover:bg-sage/90 disabled:opacity-50"
+            >
+              {connectGcal.isPending ? "Opening Google…" : "Connect Google Calendar"}
+            </button>
           </div>
         )}
+
       </section>
 
       <section className="p-6 rounded-3xl bg-white border border-border-subtle shadow-sm">
