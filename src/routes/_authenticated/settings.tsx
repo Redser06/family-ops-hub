@@ -27,7 +27,6 @@ function SettingsPage() {
   const queryClient = useQueryClient();
   const [inviteEmail, setInviteEmail] = useState("");
   const [invite, setInvite] = useState<{ token: string } | null>(null);
-  const [connections, setConnections] = useState<any[]>([]);
 
   async function createInvite() {
     if (!householdId || !inviteEmail.trim()) return;
