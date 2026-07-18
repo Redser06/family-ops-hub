@@ -100,6 +100,7 @@ function TodayPage() {
   const instances = data?.instances ?? [];
 
   // Merge events + tasks with due_at today for the agenda
+  const gcalEvents = gcal?.events ?? [];
   const agendaItems = [
     ...events.map((e: any) => ({
       kind: "event" as const,
@@ -107,6 +108,13 @@ function TodayPage() {
       title: e.title,
       time: e.start_at,
       subtitle: e.location || e.description || null,
+    })),
+    ...gcalEvents.map((e: any) => ({
+      kind: "event" as const,
+      id: "g_" + e.id,
+      title: e.title,
+      time: e.start_at,
+      subtitle: e.location || null,
     })),
     ...tasks
       .filter((t: any) => t.due_at)
