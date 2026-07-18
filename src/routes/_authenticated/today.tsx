@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { membershipQuery, todayOverviewQuery } from "@/lib/queries";
+import { membershipQuery, todayOverviewQuery, startOfTodayISO, endOfTodayISO } from "@/lib/queries";
+import { googleCalendarEventsQuery } from "@/lib/googleCalendarQueries";
 import { supabase } from "@/integrations/supabase/client";
 import { logActivity, ensureRoutineInstance } from "@/lib/mutations";
 import { format, formatDistanceToNow } from "date-fns";
