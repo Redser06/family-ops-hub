@@ -46,19 +46,6 @@ function SettingsPage() {
     toast.success("Invite created");
   }
 
-  async function loadConnections() {
-    if (!householdId) return;
-    const { data } = await supabase
-      .from("calendar_connections")
-      .select("*")
-      .eq("household_id", householdId);
-    setConnections(data ?? []);
-  }
-
-  // load on mount
-  if (householdId && connections.length === 0) {
-    void loadConnections();
-  }
 
   function copyInvite() {
     if (!invite) return;
