@@ -67,6 +67,47 @@ function SettingsPage() {
     toast.success("Invite code copied");
   }
 
+  // Google Calendar (per-user App User Connector)
+  const gcalStatus = useQuery(googleCalendarStatusQuery);
+  const startConnectFn = useServerFn(startGoogleCalendarConnect);
+  const saveConnFn = useServerFn(saveGoogleCalendarConnection);
+  const disconnectFn = useServerFn(disconnectGoogleCalendar);
+
+  const connectGcal = useMutation({
+    mutationFn: async () => {
+      const result = await connectAppUser({
+        connectorId: "google_calendar",
+        gatewayBaseUrl: "https://connector-gateway.lovable.dev",
+        start: async (targetOrigin) => await startConnectFn({ data: targetOrigin }),
+      });
+      if (!result.success) throw new Error(result.error ?? "Connection failed");
+      if (result.connectionAPIKey) {
+        await saveConnFn({ data: { connectionAPIKey: result.connectionAPIKey } });
+      }
+    },
+    onSuccess: () => {
+      toast.success("Google Calendar connected");
+      queryClient.invalidateQueries({ queryKey: ["google-calendar"] });
+      queryClient.invalidateQueries({ queryKey: ["today"] });
+      queryClient.invalidateQueries({ queryKey: ["week"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to connect"),
+  });
+
+  const disconnectGcal = useMutation({
+    mutationFn: async () => {
+      await disconnectFn();
+    },
+    onSuccess: () => {
+      toast.success("Google Calendar disconnected");
+      queryClient.invalidateQueries({ queryKey: ["google-calendar"] });
+      queryClient.invalidateQueries({ queryKey: ["today"] });
+      queryClient.invalidateQueries({ queryKey: ["week"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to disconnect"),
+  });
+
+
   const mcpUrl = typeof window !== "undefined" ? `${window.location.origin}/mcp` : "/mcp";
 
   return (
