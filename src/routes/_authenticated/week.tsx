@@ -13,6 +13,7 @@ function WeekPage() {
   const { data: membership } = useQuery(membershipQuery);
   const householdId = membership?.household_id;
   const { data } = useQuery(weekOverviewQuery(householdId));
+  const { data: gcal } = useQuery(googleCalendarEventsQuery(startOfTodayISO(), endOfWeekISO()));
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const days = Array.from({ length: 7 }, (_, i) => addDays(today, i));
